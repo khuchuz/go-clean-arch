@@ -27,9 +27,9 @@ func NewUserHandler(e *echo.Echo, us domain.UserUsecase) {
 		AUsecase: us,
 	}
 	e.GET("/users", handler.FetchUser)
-	e.POST("/users", handler.Store)
+	e.POST("/signup", handler.Store)
+	e.POST("/login", handler.Login)
 	e.GET("/users/:id", handler.GetByID)
-	e.DELETE("/users/:id", handler.Delete)
 }
 
 // FetchUser will fetch the user based on given params
@@ -95,6 +95,19 @@ func (a *UserHandler) Store(c echo.Context) (err error) {
 	}
 
 	return c.JSON(http.StatusCreated, user)
+}
+
+// Login will get the user by given request body
+func (a *UserHandler) Login(c echo.Context) (err error) {
+	email := c.Param("email")
+	ctx := c.Request().Context()
+
+	art, err := a.AUsecase.GetByEmail(ctx, email)
+	if err != nil {
+		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, art)
 }
 
 // Delete will delete user by given param
