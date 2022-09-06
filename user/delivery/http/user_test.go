@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/khuchuz/faker"
+	"github.com/bxcodec/faker"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
