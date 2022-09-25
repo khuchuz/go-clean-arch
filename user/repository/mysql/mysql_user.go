@@ -7,8 +7,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/khuchuz/go-clean-arch/user/repository"
 	"github.com/khuchuz/go-clean-arch/domain"
+	"github.com/khuchuz/go-clean-arch/user/repository"
 )
 
 type mysqlUserRepository struct {
@@ -94,9 +94,25 @@ func (m *mysqlUserRepository) GetByID(ctx context.Context, id int64) (res domain
 	return
 }
 
+func (m *mysqlUserRepository) GetLastUser(ctx context.Context, id int64) (res domain.User, err error) {
+	query := `SELECT id, name, password, email, updated_at, created_at FROM user ORDER BY id DESC LIMIT 1`
+
+	list, err := m.QueryRow(ctx, query, id)
+	if err != nil {
+		return domain.User{}, err
+	}
+
+	if len(list) > 0 {
+		res = list[0]
+	} else {
+		return res, domain.ErrNotFound
+	}
+
+	return
+}
+
 func (m *mysqlUserRepository) GetByEmail(ctx context.Context, email string) (res domain.User, err error) {
-	query := `SELECT id,name,password,email, updated_at, created_at
-  						FROM user WHERE email = ?`
+	query := `SELECT id, name, password, email, updated_at, created_at FROM user WHERE email = ?`
 
 	list, err := m.fetch(ctx, query, email)
 	if err != nil {
@@ -111,14 +127,14 @@ func (m *mysqlUserRepository) GetByEmail(ctx context.Context, email string) (res
 	return
 }
 
-func (m *mysqlUserRepository) Store(ctx context.Context, a *domain.User) (err error) {
-	query := `INSERT  user SET name=? , password=? , email=?, updated_at=? , created_at=?`
+func (m *mysqlUserRepository) Signup(ctx context.Context, a *domain.User) (err error) {
+	query := `INSERT user SET name=? , password=? , email=?`
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
 
-	res, err := stmt.ExecContext(ctx, a.Email, a.Password, a.UpdatedAt, a.CreatedAt)
+	res, err := stmt.ExecContext(ctx, a.Name, a.Email, a.Password)
 	if err != nil {
 		return
 	}

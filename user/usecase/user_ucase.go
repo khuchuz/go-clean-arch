@@ -15,7 +15,7 @@ type userUsecase struct {
 // NewUserUsecase will create new an userUsecase object representation of domain.UserUsecase interface
 func NewUserUsecase(a domain.UserRepository, timeout time.Duration) domain.UserUsecase {
 	return &userUsecase{
-		userRepo:    a,
+		userRepo:       a,
 		contextTimeout: timeout,
 	}
 }
@@ -71,7 +71,7 @@ func (a *userUsecase) GetByEmail(c context.Context, email string) (res domain.Us
 	return
 }
 
-func (a *userUsecase) Store(c context.Context, m *domain.User) (err error) {
+func (a *userUsecase) Signup(c context.Context, m *domain.User) (err error) {
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
 	existedUser, _ := a.GetByEmail(ctx, m.Email)
@@ -79,7 +79,7 @@ func (a *userUsecase) Store(c context.Context, m *domain.User) (err error) {
 		return domain.ErrConflict
 	}
 
-	err = a.userRepo.Store(ctx, m)
+	err = a.userRepo.Signup(ctx, m)
 	return
 }
 

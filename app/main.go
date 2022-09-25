@@ -9,7 +9,6 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
-	"github.com/spf13/viper"
 
 	_userHttpDelivery "github.com/khuchuz/go-clean-arch/user/delivery/http"
 	_userHttpDeliveryMiddleware "github.com/khuchuz/go-clean-arch/user/delivery/http/middleware"
@@ -17,24 +16,12 @@ import (
 	_userUcase "github.com/khuchuz/go-clean-arch/user/usecase"
 )
 
-func init() {
-	viper.SetConfigFile(`config.json`)
-	err := viper.ReadInConfig()
-	if err != nil {
-		panic(err)
-	}
-
-	if viper.GetBool(`debug`) {
-		log.Println("Service RUN on DEBUG mode")
-	}
-}
-
 func main() {
-	dbHost := viper.GetString(`database.host`)
-	dbPort := viper.GetString(`database.port`)
-	dbUser := viper.GetString(`database.user`)
-	dbPass := viper.GetString(`database.pass`)
-	dbName := viper.GetString(`database.name`)
+	dbHost := "localhost"
+	dbPort := "3306"
+	dbUser := "root"
+	dbPass := ""
+	dbName := "project1"
 	connection := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
 	val := url.Values{}
 	val.Add("parseTime", "1")
@@ -62,9 +49,9 @@ func main() {
 	e.Use(middL.CORS)
 	ar := _userRepo.NewMysqlUserRepository(dbConn)
 
-	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
+	timeoutContext := time.Duration(2) * time.Second
 	au := _userUcase.NewUserUsecase(ar, timeoutContext)
 	_userHttpDelivery.NewUserHandler(e, au)
 
-	log.Fatal(e.Start(viper.GetString("server.address")))
+	log.Fatal(e.Start(":9090"))
 }

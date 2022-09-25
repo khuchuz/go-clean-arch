@@ -27,9 +27,9 @@ func NewUserHandler(e *echo.Echo, us domain.UserUsecase) {
 		AUsecase: us,
 	}
 	e.GET("/users", handler.FetchUser)
-	e.POST("/signup", handler.Store)
-	e.POST("/login", handler.Login)
 	e.GET("/users/:id", handler.GetByID)
+	e.POST("/signup", handler.Signup)
+	e.POST("/signin", handler.Signin)
 }
 
 // FetchUser will fetch the user based on given params
@@ -75,8 +75,8 @@ func isRequestValid(m *domain.User) (bool, error) {
 	return true, nil
 }
 
-// Store will store the user by given request body
-func (a *UserHandler) Store(c echo.Context) (err error) {
+// Signup will signup the user by given request body
+func (a *UserHandler) Signup(c echo.Context) (err error) {
 	var user domain.User
 	err = c.Bind(&user)
 	if err != nil {
@@ -89,16 +89,20 @@ func (a *UserHandler) Store(c echo.Context) (err error) {
 	}
 
 	ctx := c.Request().Context()
-	err = a.AUsecase.Store(ctx, &user)
+	err = a.AUsecase.Signup(ctx, &user)
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusCreated, user)
+	art, err := a.AUsecase.GetByEmail(ctx, user.Email)
+	if err != nil {
+		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+	}
+	return c.JSON(http.StatusCreated, art)
 }
 
-// Login will get the user by given request body
-func (a *UserHandler) Login(c echo.Context) (err error) {
+// Signin will get the user by given request body
+func (a *UserHandler) Signin(c echo.Context) (err error) {
 	email := c.Param("email")
 	ctx := c.Request().Context()
 
@@ -108,24 +112,6 @@ func (a *UserHandler) Login(c echo.Context) (err error) {
 	}
 
 	return c.JSON(http.StatusOK, art)
-}
-
-// Delete will delete user by given param
-func (a *UserHandler) Delete(c echo.Context) error {
-	idP, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return c.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
-	}
-
-	id := int64(idP)
-	ctx := c.Request().Context()
-
-	err = a.AUsecase.Delete(ctx, id)
-	if err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
-	}
-
-	return c.NoContent(http.StatusNoContent)
 }
 
 func getStatusCode(err error) int {

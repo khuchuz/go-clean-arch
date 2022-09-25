@@ -96,8 +96,8 @@ func (_m *UserUsecase) GetByEmail(ctx context.Context, email string) (domain.Use
 	return r0, r1
 }
 
-// Store provides a mock function with given fields: _a0, _a1
-func (_m *UserUsecase) Store(_a0 context.Context, _a1 *domain.User) error {
+// Signup provides a mock function with given fields: _a0, _a1
+func (_m *UserUsecase) Signup(_a0 context.Context, _a1 *domain.User) error {
 	ret := _m.Called(_a0, _a1)
 
 	var r0 error
