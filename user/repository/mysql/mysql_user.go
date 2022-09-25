@@ -5,10 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/khuchuz/go-clean-arch/domain"
 	"github.com/khuchuz/go-clean-arch/user/repository"
+	"github.com/sirupsen/logrus"
 )
 
 type mysqlUserRepository struct {
@@ -77,27 +76,10 @@ func (m *mysqlUserRepository) Fetch(ctx context.Context, cursor string, num int6
 	return
 }
 func (m *mysqlUserRepository) GetByID(ctx context.Context, id int64) (res domain.User, err error) {
-	query := `SELECT id,name,password,email, updated_at, created_at
+	query := `SELECT id, name, password, email, updated_at, created_at
   						FROM user WHERE ID = ?`
 
 	list, err := m.fetch(ctx, query, id)
-	if err != nil {
-		return domain.User{}, err
-	}
-
-	if len(list) > 0 {
-		res = list[0]
-	} else {
-		return res, domain.ErrNotFound
-	}
-
-	return
-}
-
-func (m *mysqlUserRepository) GetLastUser(ctx context.Context, id int64) (res domain.User, err error) {
-	query := `SELECT id, name, password, email, updated_at, created_at FROM user ORDER BY id DESC LIMIT 1`
-
-	list, err := m.QueryRow(ctx, query, id)
 	if err != nil {
 		return domain.User{}, err
 	}

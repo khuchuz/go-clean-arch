@@ -41,7 +41,10 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'Makan Ayam','Password 1',"akun1@gmail.com",'2017-05-18 13:50:19','2017-05-18 13:50:19'), (2,'Makan Ikan','Password 2',"akun2@gmail.com",'2017-05-18 13:50:19','2017-05-18 13:50:19'), (3,'Makan Sayur','Password 3',"akun3@gmail.com",'2017-05-18 13:50:19','2017-05-18 13:50:19');
+INSERT INTO `user` VALUES
+(1,'Makan Ayam',"akun1@gmail.com",'Password 1','2017-05-18 13:50:19','2017-05-18 13:50:19'),
+(2,'Makan Ikan',"akun2@gmail.com",'Password 2','2017-05-18 13:50:19','2017-05-18 13:50:19'),
+(3,'Makan Sayur',"akun3@gmail.com",'Password 3','2017-05-18 13:50:19','2017-05-18 13:50:19');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
